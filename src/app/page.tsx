@@ -5,15 +5,67 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/user-context";
 import { Globe, Palette, Settings, ShieldCheck, User } from "lucide-react";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
+
+  if (isUserLoading) {
+    return (
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-9 w-1/2" />
+          <Skeleton className="h-5 w-3/4" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-5 w-2/3" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-7 w-1/2 mb-2" />
+              <Skeleton className="h-4 w-full" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-5 w-2/3" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-7 w-1/2 mb-2" />
+              <Skeleton className="h-4 w-full" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-5 w-2-3" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-7 w-1/2 mb-2" />
+              <Skeleton className="h-4 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+        <div className="mt-8">
+          <Skeleton className="h-8 w-1/4 mb-4" />
+          <div className="flex flex-wrap gap-4">
+            <Skeleton className="h-11 w-32" />
+            <Skeleton className="h-11 w-36" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <div>Please log in to continue.</div>
+  }
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
         <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Welcome, {user?.name.split(" ")[0] || "User"}!
+          Welcome, {user?.username.split(" ")[0] || "User"}!
         </h1>
         <p className="text-muted-foreground">
           Here's your personal dashboard for Aether Settings Sync.

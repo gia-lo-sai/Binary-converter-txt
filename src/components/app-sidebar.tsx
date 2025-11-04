@@ -12,17 +12,16 @@ import {
   SidebarFooter,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useUser } from "@/context/user-context";
 import { Button } from "./ui/button";
 import Image from "next/image";
+import { Skeleton } from "./ui/skeleton";
 
 const AppSidebar = () => {
   const pathname = usePathname();
-  const { user, logout } = useUser();
+  const { user, logout, isUserLoading } = useUser();
 
   const menuItems = [
     { href: "/", label: "Home", icon: Home },
@@ -34,34 +33,39 @@ const AppSidebar = () => {
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-3">
-          <SidebarTrigger>
-            <PanelLeft className="text-muted-foreground" />
-          </SidebarTrigger>
-          <div className="flex-1 overflow-hidden group-data-[collapsible=icon]:hidden">
-             <Link href="/" className="font-headline text-lg font-semibold tracking-tight">
-              Aether Sync
-             </Link>
-          </div>
+           <Link href="/" className="font-headline text-lg font-semibold tracking-tight">
+            Aether Sync
+           </Link>
         </div>
       </SidebarHeader>
 
       <SidebarContent className="p-2">
-        {user ? (
+        {isUserLoading ? (
+          <div className="mb-4 rounded-lg bg-sidebar-accent p-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="overflow-hidden group-data-[collapsible=icon]:hidden space-y-1">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </div>
+          </div>
+        ) : user ? (
           <div className="mb-4 rounded-lg bg-sidebar-accent p-3">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10">
                 {user.avatarUrl && (
-                  <Image src={user.avatarUrl} alt={user.name} width={40} height={40} data-ai-hint="profile avatar" />
+                  <Image src={user.avatarUrl} alt={user.username} width={40} height={40} data-ai-hint="profile avatar" />
                 )}
                 <AvatarFallback>
-                  {user.name
+                  {user.username
                     .split(" ")
                     .map((n) => n[0])
                     .join("")}
                 </AvatarFallback>
               </Avatar>
               <div className="overflow-hidden group-data-[collapsible=icon]:hidden">
-                <p className="font-semibold truncate">{user.name}</p>
+                <p className="font-semibold truncate">{user.username}</p>
                 <p className="text-xs text-muted-foreground truncate">
                   {user.email}
                 </p>
@@ -77,6 +81,7 @@ const AppSidebar = () => {
                 asChild
                 variant={pathname === item.href ? "secondary" : "ghost"}
                 className="w-full justify-start gap-2"
+                disabled={isUserLoading || (!user && item.href !== '/')}
               >
                 <Link href={item.href}>
                   <item.icon className="h-4 w-4" />
@@ -97,6 +102,7 @@ const AppSidebar = () => {
               variant="ghost"
               className="w-full justify-start gap-2"
               onClick={logout}
+              disabled={isUserLoading || !user}
             >
               <LogOut className="h-4 w-4" />
               <span className="group-data-[collapsible=icon]:hidden">

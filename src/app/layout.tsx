@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { UserProvider } from '@/context/user-context';
+import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'Aether Settings Sync',
@@ -31,17 +32,19 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <UserProvider>
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset>
-                <div className="p-4 sm:p-6 lg:p-8">{children}</div>
-                <Toaster />
-              </SidebarInset>
-            </SidebarProvider>
-          </UserProvider>
-        </ThemeProvider>
+        <FirebaseClientProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <UserProvider>
+              <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset>
+                  <div className="p-4 sm:p-6 lg:p-8">{children}</div>
+                  <Toaster />
+                </SidebarInset>
+              </SidebarProvider>
+            </UserProvider>
+          </ThemeProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );

@@ -6,20 +6,62 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/user-context";
-import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProfilePage() {
-  const { user, updateUser } = useUser();
-  const { toast } = useToast();
-  const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
-  const [avatar, setAvatar] = useState(user?.avatarUrl || "");
+  const { user, updateUser, isUserLoading } = useUser();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [avatar, setAvatar] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username);
+      setEmail(user.email);
+      setAvatar(user.avatarUrl);
+    }
+  }, [user]);
+
+  if (isUserLoading) {
+    return (
+        <div className="space-y-8">
+            <div className="flex items-center gap-4">
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-9 w-40" />
+            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-1/3" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="flex items-center space-x-4">
+                        <Skeleton className="h-20 w-20 rounded-full" />
+                        <Skeleton className="h-10 w-28" />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                    <div className="flex justify-end">
+                        <Skeleton className="h-10 w-32" />
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+  }
+  
   if (!user) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -29,11 +71,7 @@ export default function ProfilePage() {
   }
 
   const handleSaveChanges = () => {
-    updateUser({ name, email, avatarUrl: avatar });
-    toast({
-      title: "Profile Updated",
-      description: "Your changes have been saved successfully.",
-    });
+    updateUser({ username, email, avatarUrl: avatar });
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +112,7 @@ export default function ProfilePage() {
               {avatar && (
                 <Image
                   src={avatar}
-                  alt={user.name}
+                  alt={user.username}
                   width={80}
                   height={80}
                   className="object-cover"
@@ -82,7 +120,7 @@ export default function ProfilePage() {
                 />
               )}
               <AvatarFallback className="text-2xl">
-                {user.name
+                {user.username
                   .split(" ")
                   .map((n) => n[0])
                   .join("")}
@@ -104,8 +142,8 @@ export default function ProfilePage() {
               <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -115,6 +153,7 @@ export default function ProfilePage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled // Firebase email updates require re-authentication, so disable for now.
               />
             </div>
           </div>

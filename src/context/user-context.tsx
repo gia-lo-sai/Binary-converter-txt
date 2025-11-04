@@ -1,60 +1,75 @@
 "use client";
 
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useFirebase, useDoc, useMemoFirebase, useUser as useFirebaseAuthUser } from "@/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
-type User = {
-  name: string;
-  email: string;
+type UserProfile = {
+  id: string;
+  username: string;
   avatarUrl: string;
+  email: string;
 };
 
 type UserContextType = {
-  user: User | null;
+  user: UserProfile | null;
   logout: () => void;
-  updateUser: (newDetails: Partial<User>) => void;
+  updateUser: (newDetails: Partial<UserProfile>) => void;
+  isUserLoading: boolean;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const mockUser: User = {
-  name: "Jane Doe",
-  email: "jane.doe@example.com",
-  avatarUrl: PlaceHolderImages.find(img => img.id === 'user-avatar')?.imageUrl || '',
-};
-
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(mockUser);
+  const { auth, firestore } = useFirebase();
+  const { user: authUser, isUserLoading: isAuthLoading } = useFirebaseAuthUser();
   const { toast } = useToast();
 
+  const userProfileRef = useMemoFirebase(() => {
+    if (!firestore || !authUser) return null;
+    return doc(firestore, "users", authUser.uid, "profile");
+  }, [firestore, authUser]);
+
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
+
   const logout = () => {
-    // In a real app, you'd call Firebase/backend here
-    setUser(null);
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out.",
-    });
-    // In a real app, you would likely redirect to a login page
-    // For this demo, we'll just update the state
-    setTimeout(() => {
-        // Simulate logging back in for demo purposes
-        setUser(mockUser);
+    if (auth) {
+      signOut(auth);
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      });
+    }
+  };
+
+  const updateUser = (newDetails: Partial<UserProfile>) => {
+    if (userProfileRef && userProfile) {
+        const updatedProfile = { ...userProfile, ...newDetails };
+        setDocumentNonBlocking(userProfileRef, updatedProfile, { merge: true });
         toast({
-            title: "Welcome Back!",
-            description: "You have been logged back in for this demo.",
+            title: "Profile Updated",
+            description: "Your changes have been saved successfully.",
         });
-    }, 2000);
+    }
   };
   
-  const updateUser = (newDetails: Partial<User>) => {
-    if(user) {
-      setUser(prevUser => ({...prevUser!, ...newDetails}));
+  const user = useMemo(() => {
+    if (userProfile && authUser) {
+      return {
+        ...userProfile,
+        email: authUser.email || userProfile.email,
+        id: authUser.uid
+      };
     }
-  }
+    return null;
+  }, [userProfile, authUser])
+
 
   return (
-    <UserContext.Provider value={{ user, logout, updateUser }}>
+    <UserContext.Provider value={{ user, logout, updateUser, isUserLoading: isAuthLoading || isProfileLoading }}>
       {children}
     </UserContext.Provider>
   );
