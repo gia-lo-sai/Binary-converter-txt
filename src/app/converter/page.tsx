@@ -36,14 +36,12 @@ export default function ConverterPage() {
     reader.onload = (e) => {
       const arrayBuffer = e.target?.result as ArrayBuffer;
       if (arrayBuffer) {
-        const bytes = new Uint8Array(arrayBuffer);
-        const text = Array.from(bytes)
-          .map((byte) => byte.toString(16).padStart(2, '0'))
-          .join(' ');
+        const decoder = new TextDecoder('utf-8');
+        const text = decoder.decode(arrayBuffer);
         setConvertedText(text);
         toast({
           title: 'File convertito',
-          description: 'Il file .bin è stato convertito con successo.',
+          description: 'Il file .bin è stato convertito in testo leggibile.',
         });
       }
     };
@@ -71,7 +69,7 @@ export default function ConverterPage() {
       return;
     }
 
-    const blob = new Blob([convertedText], { type: 'text/plain' });
+    const blob = new Blob([convertedText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -108,7 +106,7 @@ export default function ConverterPage() {
               <CardHeader>
                 <CardTitle className="font-headline">Carica e Converti</CardTitle>
                 <CardDescription>
-                  Seleziona un file `.bin` dal tuo computer per convertirlo in un file di testo.
+                  Seleziona un file `.bin` dal tuo computer per convertirlo in un file di testo leggibile.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -117,7 +115,7 @@ export default function ConverterPage() {
                     <Input
                         id="bin-file"
                         type="file"
-                        accept=".bin"
+                        accept=".bin,application/octet-stream"
                         ref={fileInputRef}
                         onChange={handleFileChange}
                         className="hidden"
@@ -130,7 +128,7 @@ export default function ConverterPage() {
                 {convertedText && (
                   <div className="space-y-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="converted-output">Output Convertito (TXT)</Label>
+                        <Label htmlFor="converted-output">Output Convertito (Testo Leggibile)</Label>
                         <Textarea
                         id="converted-output"
                         readOnly
