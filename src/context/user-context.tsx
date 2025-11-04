@@ -3,9 +3,10 @@
 import React, { createContext, useContext, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useFirebase, useDoc, useMemoFirebase, useUser as useFirebaseAuthUser } from "@/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { updateEmail } from "firebase/auth";
 
 type UserProfile = {
   id: string;
@@ -30,7 +31,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const userProfileRef = useMemoFirebase(() => {
     if (!firestore || !authUser) return null;
-    return doc(firestore, "users", authUser.uid, "profile");
+    return doc(firestore, "users", authUser.uid, "profile", authUser.uid);
   }, [firestore, authUser]);
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
@@ -46,13 +47,36 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updateUser = (newDetails: Partial<UserProfile>) => {
-    if (userProfileRef && userProfile) {
+    if (userProfileRef && userProfile && auth.currentUser) {
         const updatedProfile = { ...userProfile, ...newDetails };
-        setDocumentNonBlocking(userProfileRef, updatedProfile, { merge: true });
-        toast({
-            title: "Profile Updated",
-            description: "Your changes have been saved successfully.",
-        });
+        
+        if (newDetails.email && newDetails.email !== auth.currentUser.email) {
+            updateEmail(auth.currentUser, newDetails.email).then(() => {
+                setDocumentNonBlocking(userProfileRef, updatedProfile, { merge: true });
+                toast({
+                    title: "Profile Updated",
+                    description: "Your changes have been saved successfully.",
+                });
+            }).catch((error) => {
+                let description = "An unknown error occurred while updating your email.";
+                if (error.code === 'auth/requires-recent-login') {
+                    description = "Please log in again to update your email address.";
+                } else if (error.code === 'auth/email-already-in-use') {
+                    description = "This email is already in use by another account.";
+                }
+                toast({
+                    variant: "destructive",
+                    title: "Email Update Failed",
+                    description: description,
+                });
+            });
+        } else {
+            setDocumentNonBlocking(userProfileRef, updatedProfile, { merge: true });
+            toast({
+                title: "Profile Updated",
+                description: "Your changes have been saved successfully.",
+            });
+        }
     }
   };
   
@@ -64,8 +88,28 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         id: authUser.uid
       };
     }
+    // Create a default profile for anonymous users or new users
+    if (authUser && !userProfile) {
+      const isAnonymous = authUser.isAnonymous;
+      const uid = authUser.uid;
+      const defaultUsername = isAnonymous ? `Guest-${uid.substring(0, 5)}` : (authUser.email?.split('@')[0] || `User-${uid.substring(0,5)}`);
+      const defaultEmail = isAnonymous ? "anonymous@example.com" : authUser.email || "";
+
+      const defaultProfile: UserProfile = {
+        id: uid,
+        username: defaultUsername,
+        avatarUrl: `https://i.pravatar.cc/150?u=${uid}`,
+        email: defaultEmail,
+      };
+
+      if (userProfileRef) {
+        setDocumentNonBlocking(userProfileRef, defaultProfile, { merge: true });
+      }
+
+      return defaultProfile;
+    }
     return null;
-  }, [userProfile, authUser])
+  }, [userProfile, authUser, userProfileRef]);
 
 
   return (

@@ -40,7 +40,7 @@ export default function SettingsClient() {
 
   const settingsRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return doc(firestore, "users", user.id, "settings");
+    return doc(firestore, "users", user.id, "settings", user.id);
   }, [firestore, user]);
 
   const { data: settings, isLoading: areSettingsLoading } = useDoc<AppSettings>(settingsRef);

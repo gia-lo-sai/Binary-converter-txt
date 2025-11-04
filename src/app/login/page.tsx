@@ -23,9 +23,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { FirebaseError } from 'firebase/app';
+import { setDoc, doc } from 'firebase/firestore';
 
 export default function LoginPage() {
-  const { auth } = useFirebase();
+  const { auth, firestore } = useFirebase();
   const { user } = useUser();
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -75,6 +76,34 @@ export default function LoginPage() {
     });
   };
 
+  const createInitialUserData = async (userId: string, email: string, username?: string) => {
+    if (!firestore) return;
+    const userProfileRef = doc(firestore, 'users', userId, 'profile', userId);
+    const userSettingsRef = doc(firestore, 'users', userId, 'settings', userId);
+
+    const profileData = {
+      id: userId,
+      username: username || email.split('@')[0],
+      avatarUrl: `https://i.pravatar.cc/150?u=${userId}`,
+      email: email
+    };
+
+    const settingsData = {
+      id: userId,
+      userProfileId: userId,
+      theme: 'system',
+      language: 'en'
+    };
+
+    try {
+      await setDoc(userProfileRef, profileData);
+      await setDoc(userSettingsRef, settingsData);
+    } catch(e) {
+      console.error("Error creating initial user data", e)
+    }
+
+  }
+
   const handleSignUp = () => {
     if (!email || !password) {
         toast({
@@ -84,7 +113,9 @@ export default function LoginPage() {
         });
         return;
     }
-    initiateEmailSignUp(auth, email, password, undefined, handleError);
+    initiateEmailSignUp(auth, email, password, (cred) => {
+      createInitialUserData(cred.user.uid, email);
+    }, handleError);
   };
 
   const handleSignIn = () => {
@@ -100,7 +131,9 @@ export default function LoginPage() {
   };
 
   const handleAnonymousSignIn = () => {
-    initiateAnonymousSignIn(auth);
+    initiateAnonymousSignIn(auth, (cred) => {
+       createInitialUserData(cred.user.uid, "anonymous@example.com", `Guest-${cred.user.uid.substring(0,5)}`);
+    }, handleError);
   };
 
   if (user) {
