@@ -30,21 +30,7 @@ export default function ConverterPage() {
       return;
     }
 
-    if (!file.name.endsWith('.bin')) {
-        toast({
-            variant: 'destructive',
-            title: 'File non valido',
-            description: 'Per favore, seleziona un file con estensione .bin',
-        });
-        setConvertedText(null);
-        setFileName('');
-        if(fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-        return;
-    }
-
-    setFileName(file.name.replace('.bin', '.txt'));
+    setFileName(file.name.replace(/\.[^/.]+$/, "") + '.txt');
     const reader = new FileReader();
 
     reader.onload = (e) => {
@@ -137,7 +123,7 @@ export default function ConverterPage() {
                         className="hidden"
                     />
                      <Button onClick={triggerFileSelect}>
-                        <Upload className="mr-2 h-4 w-4" /> Carica File .bin
+                        <Upload className="mr-2 h-4 w-4" /> Carica File
                     </Button>
                 </div>
 
