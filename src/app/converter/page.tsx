@@ -72,6 +72,8 @@ export default function ConverterPage() {
 
     reader.readAsArrayBuffer(file);
   };
+  
+  const triggerFileSelect = () => fileInputRef.current?.click();
 
   const handleDownload = () => {
     if (!convertedText || !fileName) {
@@ -126,19 +128,17 @@ export default function ConverterPage() {
               <CardContent className="space-y-6">
                 <div className="grid gap-2">
                   <Label htmlFor="bin-file">File .bin</Label>
-                  <div className="flex gap-2">
                     <Input
                         id="bin-file"
                         type="file"
                         accept=".bin"
                         ref={fileInputRef}
                         onChange={handleFileChange}
-                        className="flex-grow"
+                        className="hidden"
                     />
-                     <Button onClick={() => fileInputRef.current?.click()}>
-                        <Upload className="mr-2 h-4 w-4" /> Carica
+                     <Button onClick={triggerFileSelect}>
+                        <Upload className="mr-2 h-4 w-4" /> Carica File .bin
                     </Button>
-                  </div>
                 </div>
 
                 {convertedText && (
