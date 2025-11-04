@@ -8,6 +8,7 @@ type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
+  attribute?: string;
   enableSystem?: boolean;
 };
 
@@ -31,7 +32,7 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = React.useState<Theme>(() => {
-    if (typeof localStorage === 'undefined') {
+    if (typeof window === 'undefined') {
       return defaultTheme;
     }
     return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
@@ -58,7 +59,9 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
+       if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, theme);
+      }
       setTheme(theme);
     },
   };
