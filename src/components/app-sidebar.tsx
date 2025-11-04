@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, Settings, LogOut, LogIn } from "lucide-react";
+import { Home, User, Settings, LogOut, LogIn, FileText } from "lucide-react";
 
 import {
   Sidebar,
@@ -27,6 +27,7 @@ const AppSidebar = () => {
     { href: "/", label: "Home", icon: Home },
     { href: "/profile", label: "Profile", icon: User },
     { href: "/settings", label: "Settings", icon: Settings },
+    { href: "/converter", label: "Convertitore", icon: FileText },
   ];
 
   return (
@@ -81,7 +82,7 @@ const AppSidebar = () => {
                 asChild
                 variant={pathname === item.href ? "secondary" : "ghost"}
                 className="w-full justify-start gap-2"
-                disabled={isUserLoading || (!user && item.href !== '/')}
+                disabled={isUserLoading || (!user && item.href !== '/' && item.href !== '/converter')}
               >
                 <Link href={item.href}>
                   <item.icon className="h-4 w-4" />
