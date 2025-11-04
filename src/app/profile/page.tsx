@@ -16,6 +16,7 @@ export default function ProfilePage() {
   const { user, updateUser } = useUser();
   const { toast } = useToast();
   const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [avatar, setAvatar] = useState(user?.avatarUrl || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -28,7 +29,7 @@ export default function ProfilePage() {
   }
 
   const handleSaveChanges = () => {
-    updateUser({ name, avatarUrl: avatar });
+    updateUser({ name, email, avatarUrl: avatar });
     toast({
       title: "Profile Updated",
       description: "Your changes have been saved successfully.",
@@ -112,9 +113,8 @@ export default function ProfilePage() {
               <Input
                 id="email"
                 type="email"
-                defaultValue={user.email}
-                readOnly
-                disabled
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </div>
