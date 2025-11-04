@@ -52,7 +52,7 @@ export default function ConverterPage() {
       if (arrayBuffer) {
         const bytes = new Uint8Array(arrayBuffer);
         const text = Array.from(bytes)
-          .map((byte) => byte.toString())
+          .map((byte) => byte.toString(16).padStart(2, '0'))
           .join(' ');
         setConvertedText(text);
         toast({
