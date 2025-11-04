@@ -1,17 +1,21 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/user-context";
+import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function ProfilePage() {
   const { user } = useUser();
+  const { toast } = useToast();
+  const [name, setName] = useState(user?.name || "");
 
   if (!user) {
     return (
@@ -19,6 +23,24 @@ export default function ProfilePage() {
         <p>Please log in to view your profile.</p>
       </div>
     );
+  }
+
+  const handleSaveChanges = () => {
+    // In a real app, you'd save this to your backend.
+    console.log("Saving changes:", { name });
+    toast({
+      title: "Profile Updated",
+      description: "Your changes have been saved successfully.",
+    });
+  };
+  
+  const handleChangeAvatar = () => {
+    // In a real app, this would open a file picker and upload a new image.
+    toast({
+        title: "Feature not implemented",
+        description: "Avatar changing functionality is not yet available.",
+        variant: "destructive",
+    })
   }
 
   return (
@@ -41,7 +63,15 @@ export default function ProfilePage() {
         <CardContent className="space-y-6">
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-               {user.avatarUrl && <Image src={user.avatarUrl} alt={user.name} width={80} height={80} data-ai-hint="profile avatar" />}
+              {user.avatarUrl && (
+                <Image
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  width={80}
+                  height={80}
+                  data-ai-hint="profile avatar"
+                />
+              )}
               <AvatarFallback className="text-2xl">
                 {user.name
                   .split(" ")
@@ -49,20 +79,30 @@ export default function ProfilePage() {
                   .join("")}
               </AvatarFallback>
             </Avatar>
-            <Button variant="outline">Change Avatar</Button>
+            <Button variant="outline" onClick={handleChangeAvatar}>Change Avatar</Button>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" defaultValue={user.name} />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
-              <Input id="email" type="email" defaultValue={user.email} readOnly disabled />
+              <Input
+                id="email"
+                type="email"
+                defaultValue={user.email}
+                readOnly
+                disabled
+              />
             </div>
           </div>
           <div className="flex justify-end">
-             <Button>Save Changes</Button>
+            <Button onClick={handleSaveChanges}>Save Changes</Button>
           </div>
         </CardContent>
       </Card>
