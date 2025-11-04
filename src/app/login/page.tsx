@@ -21,6 +21,8 @@ import {
 import { useUser } from '@/context/user-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import type { FirebaseError } from 'firebase/app';
 
 export default function LoginPage() {
   const { auth } = useFirebase();
@@ -28,6 +30,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
@@ -35,12 +38,65 @@ export default function LoginPage() {
     }
   }, [user, router]);
 
+  const handleError = (error: FirebaseError) => {
+    let title = 'An error occurred';
+    let description = 'Please try again later.';
+
+    switch (error.code) {
+      case 'auth/invalid-email':
+        title = 'Invalid Email';
+        description = 'Please enter a valid email address.';
+        break;
+      case 'auth/user-not-found':
+        title = 'User Not Found';
+        description = 'No account found with this email. Please sign up.';
+        break;
+      case 'auth/wrong-password':
+        title = 'Incorrect Password';
+        description = 'The password you entered is incorrect. Please try again.';
+        break;
+      case 'auth/email-already-in-use':
+        title = 'Email Already in Use';
+        description = 'An account with this email already exists. Please sign in.';
+        break;
+      case 'auth/weak-password':
+        title = 'Weak Password';
+        description = 'The password must be at least 6 characters long.';
+        break;
+      default:
+        description = error.message;
+        break;
+    }
+
+    toast({
+      variant: 'destructive',
+      title: title,
+      description: description,
+    });
+  };
+
   const handleSignUp = () => {
-    initiateEmailSignUp(auth, email, password);
+    if (!email || !password) {
+        toast({
+            variant: 'destructive',
+            title: 'Missing Fields',
+            description: 'Please enter both email and password.',
+        });
+        return;
+    }
+    initiateEmailSignUp(auth, email, password, undefined, handleError);
   };
 
   const handleSignIn = () => {
-    initiateEmailSignIn(auth, email, password);
+     if (!email || !password) {
+        toast({
+            variant: 'destructive',
+            title: 'Missing Fields',
+            description: 'Please enter both email and password.',
+        });
+        return;
+    }
+    initiateEmailSignIn(auth, email, password, undefined, handleError);
   };
 
   const handleAnonymousSignIn = () => {
