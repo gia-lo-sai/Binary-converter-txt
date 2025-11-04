@@ -10,12 +10,14 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function ProfilePage() {
-  const { user } = useUser();
+  const { user, updateUser } = useUser();
   const { toast } = useToast();
   const [name, setName] = useState(user?.name || "");
+  const [avatar, setAvatar] = useState(user?.avatarUrl || "");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!user) {
     return (
@@ -26,22 +28,27 @@ export default function ProfilePage() {
   }
 
   const handleSaveChanges = () => {
-    // In a real app, you'd save this to your backend.
-    console.log("Saving changes:", { name });
+    updateUser({ name, avatarUrl: avatar });
     toast({
       title: "Profile Updated",
       description: "Your changes have been saved successfully.",
     });
   };
-  
-  const handleChangeAvatar = () => {
-    // In a real app, this would open a file picker and upload a new image.
-    toast({
-        title: "Feature not implemented",
-        description: "Avatar changing functionality is not yet available.",
-        variant: "destructive",
-    })
-  }
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerAvatarChange = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <div className="space-y-8">
@@ -63,12 +70,13 @@ export default function ProfilePage() {
         <CardContent className="space-y-6">
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              {user.avatarUrl && (
+              {avatar && (
                 <Image
-                  src={user.avatarUrl}
+                  src={avatar}
                   alt={user.name}
                   width={80}
                   height={80}
+                  className="object-cover"
                   data-ai-hint="profile avatar"
                 />
               )}
@@ -79,7 +87,16 @@ export default function ProfilePage() {
                   .join("")}
               </AvatarFallback>
             </Avatar>
-            <Button variant="outline" onClick={handleChangeAvatar}>Change Avatar</Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAvatarChange}
+              className="hidden"
+              accept="image/*"
+            />
+            <Button variant="outline" onClick={triggerAvatarChange}>
+              Change Avatar
+            </Button>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">

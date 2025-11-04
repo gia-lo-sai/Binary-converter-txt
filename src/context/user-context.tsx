@@ -13,6 +13,7 @@ type User = {
 type UserContextType = {
   user: User | null;
   logout: () => void;
+  updateUser: (newDetails: Partial<User>) => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -45,9 +46,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         });
     }, 2000);
   };
+  
+  const updateUser = (newDetails: Partial<User>) => {
+    if(user) {
+      setUser(prevUser => ({...prevUser!, ...newDetails}));
+    }
+  }
 
   return (
-    <UserContext.Provider value={{ user, logout }}>
+    <UserContext.Provider value={{ user, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );
