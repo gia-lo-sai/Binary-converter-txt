@@ -30,9 +30,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  devServer: {
-    allowedDevOrigins: "auto"
-  }
 };
 
 export default nextConfig;
