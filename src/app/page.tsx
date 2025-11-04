@@ -1,8 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/user-context";
-import { Globe, Palette, ShieldCheck } from "lucide-react";
+import { Globe, Palette, Settings, ShieldCheck, User } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   const { user } = useUser();
@@ -63,9 +65,20 @@ export default function Home() {
 
       <div className="mt-8">
         <h2 className="font-headline text-2xl font-semibold mb-4">Quick Actions</h2>
-        <p className="text-muted-foreground">
-          Use the navigation menu on the left to explore your profile and adjust application settings. Your preferences are automatically saved.
-        </p>
+        <div className="flex flex-wrap gap-4">
+          <Button asChild size="lg">
+            <Link href="/profile">
+              <User />
+              <span>Go to Profile</span>
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="secondary">
+            <Link href="/settings">
+              <Settings />
+              <span>Adjust Settings</span>
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   );
