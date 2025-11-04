@@ -29,42 +29,56 @@ export function ThemeProvider({
   defaultTheme = "system",
   storageKey = "vite-ui-theme",
   enableSystem = false,
+  attribute = "class",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = React.useState<Theme>(() => {
+    const [theme, setTheme] = React.useState<Theme>(() => {
     if (typeof window === 'undefined') {
       return defaultTheme;
     }
     return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
   });
+  const [mounted, setMounted] = React.useState(false);
+
 
   React.useEffect(() => {
-    const root = window.document.documentElement;
+    setMounted(true);
+  }, []);
 
+  React.useEffect(() => {
+    if (!mounted) return;
+
+    const root = window.document.documentElement;
     root.classList.remove("light", "dark");
 
+    let finalTheme = theme;
     if (theme === "system" && enableSystem) {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
+      finalTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
-
-      root.classList.add(systemTheme);
-      return;
     }
 
-    root.classList.add(theme);
-  }, [theme, enableSystem]);
+    root.classList.add(finalTheme);
+  }, [theme, enableSystem, mounted]);
+
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-       if (typeof window !== 'undefined') {
-        localStorage.setItem(storageKey, theme);
+    setTheme: (newTheme: Theme) => {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, newTheme);
       }
-      setTheme(theme);
+      setTheme(newTheme);
     },
   };
+
+  if (!mounted) {
+    return (
+      <div style={{ visibility: 'hidden' }}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
