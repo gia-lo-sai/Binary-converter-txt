@@ -71,18 +71,20 @@ export function ThemeProvider({
       setTheme(newTheme);
     },
   };
+  
+  const body = <>{children}</>;
 
   if (!mounted) {
     return (
       <div style={{ visibility: 'hidden' }}>
-        {children}
+        {body}
       </div>
     );
   }
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
-      {children}
+      {body}
     </ThemeProviderContext.Provider>
   );
 }
