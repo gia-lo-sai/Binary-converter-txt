@@ -6,8 +6,8 @@
  * Each user can only access their own data, ensuring privacy and data integrity.
  *
  * Data Structure:
- * - /users/{userId}/profile: Stores user profile information.  The `userId` in the path must match the authenticated user's UID.
- * - /users/{userId}/settings: Stores user-specific app settings. The `userId` in the path must match the authenticated user's UID.
+ * - /users/{userId}/profile/{profileId}: Stores user profile information. The `userId` in the path must match the authenticated user's UID.
+ * - /users/{userId}/settings/{settingsId}: Stores user-specific app settings. The `userId` in the path must match the authenticated user's UID.
  *
  * Key Security Decisions:
  * - User data is strictly segregated and accessible only to the owning user.
@@ -20,50 +20,30 @@ service cloud.firestore {
 
     /**
      * @description Secures user profile documents, ensuring only the owning user can read and write.
-     * @path /users/{userId}/profile
-     * @allow (create, update, delete) User with UID 'user_abc' can create/update/delete their profile at /users/user_abc/profile.
-     * @allow (get, list) User with UID 'user_abc' can read their profile at /users/user_abc/profile.
-     * @deny (create, update, delete) User with UID 'user_xyz' cannot create/update/delete profile at /users/user_abc/profile.
-     * @deny (get, list) User with UID 'user_xyz' cannot read profile at /users/user_abc/profile.
+     * @path /users/{userId}/profile/{profileId}
+     * @allow (create, update, delete) User with UID 'user_abc' can create/update/delete their profile at /users/user_abc/profile/user_abc.
+     * @allow (get, list) User with UID 'user_abc' can read their profile at /users/user_abc/profile/user_abc.
+     * @deny (create, update, delete) User with UID 'user_xyz' cannot create/update/delete profile at /users/user_abc/profile/user_abc.
+     * @deny (get, list) User with UID 'user_xyz' cannot read profile at /users/user_abc/profile/user_abc.
      * @principle Enforces document ownership for all operations.
      */
-    match /users/{userId}/profile {
-      // Allow the user to read their own profile.
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if isSignedIn() && isOwner(userId);
-
-      // Allow the user to create their own profile, but enforce that the 'id' field matches the userId in the path.
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
-
-      // Allow the user to update their own profile, and ensure the 'id' field is immutable.
-      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-
-      // Allow the user to delete their own profile.
-      allow delete: if isSignedIn() && isExistingOwner(userId);
+    match /users/{userId}/profile/{profileId} {
+      // Allow the user to read and write to their own profile documents.
+      allow read, write: if isSignedIn() && isOwner(userId);
     }
 
     /**
      * @description Secures user app settings, ensuring only the owning user can read and write.
-     * @path /users/{userId}/settings
-     * @allow (create, update, delete) User with UID 'user_abc' can create/update/delete their settings at /users/user_abc/settings.
-     * @allow (get, list) User with UID 'user_abc' can read their settings at /users/user_abc/settings.
-     * @deny (create, update, delete) User with UID 'user_xyz' cannot create/update/delete settings at /users/user_abc/settings.
-     * @deny (get, list) User with UID 'user_xyz' cannot read settings at /users/user_abc/settings.
+     * @path /users/{userId}/settings/{settingsId}
+     * @allow (create, update, delete) User with UID 'user_abc' can create/update/delete their settings at /users/user_abc/settings/user_abc.
+     * @allow (get, list) User with UID 'user_abc' can read their settings at /users/user_abc/settings/user_abc.
+     * @deny (create, update, delete) User with UID 'user_xyz' cannot create/update/delete settings at /users/user_abc/settings/user_abc.
+     * @deny (get, list) User with UID 'user_xyz' cannot read settings at /users/user_abc/settings/user_abc.
      * @principle Enforces document ownership for all operations.
      */
-    match /users/{userId}/settings {
-      // Allow the user to read their own settings.
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if isSignedIn() && isOwner(userId);
-
-      // Allow the user to create their own settings, but enforce that the 'id' field matches the userId in the path and userProfileId matches userId.
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId && request.resource.data.userProfileId == userId;
-
-      // Allow the user to update their own settings, and ensure the 'id' and userProfileId fields are immutable.
-      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.id == resource.data.id && request.resource.data.userProfileId == resource.data.userProfileId;
-
-      // Allow the user to delete their own settings.
-      allow delete: if isSignedIn() && isExistingOwner(userId);
+    match /users/{userId}/settings/{settingsId} {
+      // Allow the user to read and write to their own settings documents.
+      allow read, write: if isSignedIn() && isOwner(userId);
     }
   }
 }
@@ -83,13 +63,4 @@ function isSignedIn() {
  */
 function isOwner(userId) {
   return request.auth.uid == userId;
-}
-
-/**
- * @description Checks if the requested user ID matches the authenticated user's ID and the resource exists
- * @param {string} userId The user ID to check against.
- * @returns {boolean} True if the user IDs match and the resource exists, false otherwise.
- */
-function isExistingOwner(userId) {
-    return isOwner(userId) && resource != null;
 }

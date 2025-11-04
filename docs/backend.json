@@ -18,6 +18,11 @@
           "type": "string",
           "description": "URL of the user's avatar image.",
           "format": "uri"
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
         }
       },
       "required": [
@@ -63,7 +68,7 @@
   "firestore": {
     "structure": [
       {
-        "path": "/users/{userId}/profile",
+        "path": "/users/{userId}/profile/{profileId}",
         "definition": {
           "entityName": "UserProfile",
           "schema": {
@@ -74,12 +79,16 @@
             {
               "name": "userId",
               "description": "The unique identifier for the user. Maps to the Firebase Auth UID."
+            },
+            {
+              "name": "profileId",
+              "description": "The unique identifier for the user profile document."
             }
           ]
         }
       },
       {
-        "path": "/users/{userId}/settings",
+        "path": "/users/{userId}/settings/{settingsId}",
         "definition": {
           "entityName": "AppSettings",
           "schema": {
@@ -90,11 +99,15 @@
             {
               "name": "userId",
               "description": "The unique identifier for the user. Maps to the Firebase Auth UID."
+            },
+            {
+               "name": "settingsId",
+              "description": "The unique identifier for the user settings document."
             }
           ]
         }
       }
     ],
-    "reasoning": "This design prioritizes authorization independence and simplifies security rules by denormalizing authorization data and segregating data based on access requirements.\n\n*   **User Profiles:** Stored under `/users/{userId}/profile`. This path-based ownership ensures that only the authenticated user can access their profile.\n*   **App Settings:** Stored under `/users/{userId}/settings`. This path-based ownership ensures that only the authenticated user can access their settings.\n\nThis structure achieves Authorization Independence by avoiding `get()` calls in the security rules. Each user's profile and settings are directly accessible via their `userId`. This supports the QAPs by enabling secure `list` operations, as each collection only contains documents accessible to the specific user. Segregation is achieved by keeping user-specific data under their respective user ID paths."
+    "reasoning": "This design prioritizes authorization independence and simplifies security rules by denormalizing authorization data and segregating data based on access requirements.\n\n*   **User Profiles:** Stored under `/users/{userId}/profile/{profileId}`. This path-based ownership ensures that only the authenticated user can access their profile.\n*   **App Settings:** Stored under `/users/{userId}/settings/{settingsId}`. This path-based ownership ensures that only the authenticated user can access their settings.\n\nThis structure achieves Authorization Independence by avoiding `get()` calls in the security rules. Each user's profile and settings are directly accessible via their `userId`. This supports the QAPs by enabling secure `list` operations, as each collection only contains documents accessible to the specific user. Segregation is achieved by keeping user-specific data under their respective user ID paths."
   }
 }
