@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, Settings, LogOut, PanelLeft } from "lucide-react";
+import { Home, User, Settings, LogOut, LogIn } from "lucide-react";
 
 import {
   Sidebar,
@@ -98,17 +98,33 @@ const AppSidebar = () => {
       <SidebarFooter className="p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2"
-              onClick={logout}
-              disabled={isUserLoading || !user}
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="group-data-[collapsible=icon]:hidden">
-                Logout
-              </span>
-            </Button>
+            {user ? (
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2"
+                onClick={logout}
+                disabled={isUserLoading}
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Logout
+                </span>
+              </Button>
+            ) : (
+              <Button
+                asChild
+                variant="ghost"
+                className="w-full justify-start gap-2"
+                disabled={isUserLoading}
+              >
+                <Link href="/login">
+                  <LogIn className="h-4 w-4" />
+                  <span className="group-data-[collapsible=icon]:hidden">
+                    Login
+                  </span>
+                </Link>
+              </Button>
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

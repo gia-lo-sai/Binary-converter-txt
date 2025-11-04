@@ -35,13 +35,8 @@ export default function RootLayout({
         <FirebaseClientProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <UserProvider>
-              <SidebarProvider>
-                <AppSidebar />
-                <SidebarInset>
-                  <div className="p-4 sm:p-6 lg:p-8">{children}</div>
-                  <Toaster />
-                </SidebarInset>
-              </SidebarProvider>
+                {children}
+                <Toaster />
             </UserProvider>
           </ThemeProvider>
         </FirebaseClientProvider>

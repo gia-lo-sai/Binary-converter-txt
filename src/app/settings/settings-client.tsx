@@ -24,6 +24,7 @@ import { useUser } from "@/context/user-context";
 import { doc } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 type AppSettings = {
   theme: "light" | "dark" | "system";
@@ -33,6 +34,7 @@ type AppSettings = {
 export default function SettingsClient() {
   const { setTheme: applyTheme } = useTheme();
   const { user, isUserLoading } = useUser();
+  const router = useRouter();
   const { firestore } = useFirebase();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -46,6 +48,12 @@ export default function SettingsClient() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if(!isUserLoading && !user){
+      router.push('/login');
+    }
+  }, [isUserLoading, user, router]);
 
   useEffect(() => {
     if (settings?.theme) {
