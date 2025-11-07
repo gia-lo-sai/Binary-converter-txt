@@ -75,7 +75,7 @@ export default function SettingsClient() {
     applyTheme(newTheme);
   };
   
-  const currentTheme = settings?.theme || 'system';
+  const currentTheme = settings?.theme || 'dark';
 
   if (!isMounted || isUserLoading || areSettingsLoading) {
     return (
@@ -147,9 +147,9 @@ export default function SettingsClient() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="en">English</SelectItem>
-                <SelectItem value="it">Italiano</SelectItem>
-                <SelectItem value="es">Español</SelectItem>
-                <SelectItem value="fr">Français</SelectItem>
+                <SelectItem value="it">Italian</SelectItem>
+                <SelectItem value="es">Spanish</SelectItem>
+                <SelectItem value="fr">French</SelectItem>
               </SelectContent>
             </Select>
           </div>
