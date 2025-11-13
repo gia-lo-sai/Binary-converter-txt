@@ -91,7 +91,7 @@ export default function LoginPage() {
     const settingsData = {
       id: userId,
       userProfileId: userId,
-      theme: 'system',
+      theme: 'dark',
       language: 'en'
     };
 

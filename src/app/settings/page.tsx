@@ -17,7 +17,7 @@ export default function SettingsPage() {
               <Button asChild variant="outline" size="icon">
                 <Link href="/">
                   <ArrowLeft />
-                  <span className="sr-only">Torna alla home</span>
+                  <span className="sr-only">Back to Home</span>
                 </Link>
               </Button>
               <h1 className="font-headline text-3xl font-bold tracking-tight">
