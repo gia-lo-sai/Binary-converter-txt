@@ -1,33 +1,33 @@
 # Aether Settings Sync
 
-Sviluppata da **Gia-lo-sai-&-Gemini**.
+Developed by **Gia-lo-sai-&-Gemini**.
 
-## Descrizione
+## Description
 
-**Aether Settings Sync** è un'applicazione web che consente agli utenti di gestire e sincronizzare le preferenze della loro applicazione, come il tema e la lingua, attraverso diverse sessioni. Include un sistema di autenticazione utente e un'utility per convertire file binari in testo.
+**Aether Settings Sync** is a web application that allows users to manage and synchronize their application preferences, such as theme and language, across different sessions. It includes a user authentication system and a utility to convert binary files to text.
 
-## Funzionalità Principali
+## Main Features
 
-- **Autenticazione Utente**: Sistema di login e registrazione sicuro tramite Firebase Authentication.
-- **Preferenze Sincronizzate**: Le impostazioni utente (tema, lingua) vengono salvate su Firestore e sincronizzate tra i dispositivi.
-- **Gestione Profilo**: Gli utenti possono aggiornare le informazioni del proprio profilo, inclusi username e avatar.
-- **Convertitore da Binario a TXT**: Un'utility per caricare un file `.bin` e convertirne il contenuto in un formato di testo leggibile e scaricabile.
+- **User Authentication**: Secure login and registration system via Firebase Authentication.
+- **Synced Preferences**: User settings (theme, language) are saved to Firestore and synchronized across devices.
+- **Profile Management**: Users can update their profile information, including username and avatar.
+- **Binary to TXT Converter**: A utility to upload a `.bin` file and convert its content into a readable and downloadable text format.
 
-## Struttura del Progetto
+## Project Structure
 
-Il progetto è un'applicazione Next.js con la seguente struttura:
+The project is a Next.js application with the following structure:
 
-- **`src/app/`**: Contiene le pagine principali dell'applicazione (Home, Login, Profilo, Impostazioni, Convertitore).
-- **`src/components/`**: Componenti React condivisi, inclusi elementi UI di ShadCN e la sidebar di navigazione.
-- **`src/context/`**: Provider di contesto React, come `UserProvider` per la gestione dello stato dell'utente.
-- **`src/firebase/`**: Configurazione di Firebase e hook personalizzati per interagire con Firestore e Authentication.
-- **`src/lib/`**: Funzioni di utilità e dati statici.
-- **`public/`**: Asset statici.
-- **`firestore.rules`**: Regole di sicurezza per il database Firestore.
+- **`src/app/`**: Contains the main pages of the application (Home, Login, Profile, Settings, Converter).
+- **`src/components/`**: Shared React components, including UI elements from ShadCN and the navigation sidebar.
+- **`src/context/`**: React context providers, such as `UserProvider` for user state management.
+- **`src/firebase/`**: Firebase configuration and custom hooks for interacting with Firestore and Authentication.
+- **`src/lib/`**: Utility functions and static data.
+- **`public/`**: Static assets.
+- **`firestore.rules`**: Security rules for the Firestore database.
 
-## Tecnologie Utilizzate
+## Technologies Used
 
 - **Frontend**: Next.js, React, TypeScript
 - **Backend & Database**: Firebase (Authentication, Firestore)
 - **Styling**: Tailwind CSS, ShadCN UI
-- **Librerie UI**: `lucide-react` per le icone
+- **UI Libraries**: `lucide-react` for icons

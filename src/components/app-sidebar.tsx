@@ -27,7 +27,7 @@ const AppSidebar = () => {
     { href: "/", label: "Home", icon: Home },
     { href: "/profile", label: "Profile", icon: User },
     { href: "/settings", label: "Settings", icon: Settings },
-    { href: "/converter", label: "Convertitore", icon: FileText },
+    { href: "/converter", label: "Converter", icon: FileText },
   ];
 
   return (

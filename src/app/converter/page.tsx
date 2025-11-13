@@ -40,8 +40,8 @@ export default function ConverterPage() {
         const text = decoder.decode(arrayBuffer);
         setConvertedText(text);
         toast({
-          title: 'File convertito',
-          description: 'Il file .bin è stato convertito in testo leggibile.',
+          title: 'File Converted',
+          description: 'The .bin file has been converted to readable text.',
         });
       }
     };
@@ -49,8 +49,8 @@ export default function ConverterPage() {
     reader.onerror = () => {
         toast({
             variant: 'destructive',
-            title: 'Errore',
-            description: 'Impossibile leggere il file.',
+            title: 'Error',
+            description: 'Could not read the file.',
         });
     }
 
@@ -63,8 +63,8 @@ export default function ConverterPage() {
     if (!convertedText || !fileName) {
         toast({
             variant: 'destructive',
-            title: 'Nessun file da salvare',
-            description: 'Per favore, carica e converti prima un file .bin',
+            title: 'No file to save',
+            description: 'Please upload and convert a .bin file first.',
         });
       return;
     }
@@ -79,8 +79,8 @@ export default function ConverterPage() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
      toast({
-          title: 'File scaricato',
-          description: `Salvato come ${fileName}`,
+          title: 'File Downloaded',
+          description: `Saved as ${fileName}`,
      });
   };
 
@@ -94,24 +94,24 @@ export default function ConverterPage() {
                <Button asChild variant="outline" size="icon">
                 <Link href="/">
                   <ArrowLeft />
-                  <span className="sr-only">Torna alla home</span>
+                  <span className="sr-only">Back to Home</span>
                 </Link>
               </Button>
               <h1 className="font-headline text-3xl font-bold tracking-tight">
-                Convertitore da BIN a TXT
+                BIN to TXT Converter
               </h1>
             </div>
 
             <Card>
               <CardHeader>
-                <CardTitle className="font-headline">Carica e Converti</CardTitle>
+                <CardTitle className="font-headline">Upload and Convert</CardTitle>
                 <CardDescription>
-                  Seleziona un file `.bin` dal tuo computer per convertirlo in un file di testo leggibile.
+                  Select a `.bin` file from your computer to convert it into a readable text file.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="bin-file">File .bin</Label>
+                  <Label htmlFor="bin-file">.bin File</Label>
                     <Input
                         id="bin-file"
                         type="file"
@@ -121,14 +121,14 @@ export default function ConverterPage() {
                         className="hidden"
                     />
                      <Button onClick={triggerFileSelect}>
-                        <Upload className="mr-2 h-4 w-4" /> Carica File
+                        <Upload className="mr-2 h-4 w-4" /> Upload File
                     </Button>
                 </div>
 
                 {convertedText && (
                   <div className="space-y-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="converted-output">Output Convertito (Testo Leggibile)</Label>
+                        <Label htmlFor="converted-output">Converted Output (Readable Text)</Label>
                         <Textarea
                         id="converted-output"
                         readOnly
@@ -138,7 +138,7 @@ export default function ConverterPage() {
                     </div>
                     <div className="flex justify-end">
                         <Button onClick={handleDownload}>
-                            <Download className="mr-2 h-4 w-4" /> Salva come .txt
+                            <Download className="mr-2 h-4 w-4" /> Save as .txt
                         </Button>
                     </div>
                   </div>
